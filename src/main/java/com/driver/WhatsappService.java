@@ -15,19 +15,25 @@ public class WhatsappService {
         return "SUCCESS";
     }
 
-    public Group createGroup(List<User> users) {
+    public Group createGroup(List<User> users){
         int size = users.size();
         if(size==2){
            return repository.createpersonalGroup(users);
         }
-        else {
-         return repository.createGroup(users);
+        if(size>2) {
+            return repository.createGroup(users);
         }
-        // need an exception if list.size()<2
+        else{
+            throw new RuntimeException("the input is not enough");
+            // need an exception if list.size()<2
+        }
     }
 
     public int createMessage(String content) {
-           return repository.createMessage(content);
+           int id = repository.getmessageId()+1;
+           Message message = new Message(id,content);
+           repository.AddtoMessageMap(message);
+           return id;
     }
 
     public int sendMessage(Message message, User sender, Group group) throws Exception {
@@ -37,6 +43,7 @@ public class WhatsappService {
         if(!repository.checkSender(group,sender)){
           throw  new Exception("You are not allowed to send message");
         }
+
         return repository.sendMessage(message,sender,group);
     }
 
@@ -58,7 +65,7 @@ public class WhatsappService {
         if(opt.isEmpty()){
             throw new Exception("User not found");
         }
-        if(repository.checkAdmin(opt.get(),user)){
+        if(!repository.checkAdmin(opt.get(),user)){
         throw new Exception("Cannot remove admin");
         }
         return repository.removeUser(opt.get(),user);

@@ -14,6 +14,7 @@ public class WhatsappRepository {
     private HashMap<Message, User> senderMap;
     private HashMap<Group, User> adminMap;
     private HashSet<String> userMobile;
+    private HashMap<Integer,Message> messageMap;
 
     private int customGroupCount;
     private int messageId;
@@ -26,6 +27,7 @@ public class WhatsappRepository {
         this.userMobile = new HashSet<>();
         this.customGroupCount = 0;
         this.messageId = 0;
+        this.messageMap=new HashMap<>();
     }
 
     public boolean NoAlreadyPresent(String mobile) {
@@ -49,12 +51,8 @@ public class WhatsappRepository {
         String name="Group "+customGroupCount;
         Group group = new Group(name,users.size());
         groupUserMap.put(group,users);
+        adminMap.put(group, users.get(0));
         return group;
-    }
-
-    public int createMessage(String content) {
-        messageId++;
-        return messageId;
     }
 
     public boolean GroupisnotPresent(Group group) {
@@ -77,6 +75,7 @@ public class WhatsappRepository {
 
     public int sendMessage(Message message, User sender, Group group) {
         sendmessageInsenderuserMap(message,sender);
+         AddtoMessageMap(message);
         if(groupMessageMap.containsKey(group)){
             groupMessageMap.get(group).add(message);
         }
@@ -144,6 +143,15 @@ public class WhatsappRepository {
             }
         }
         return count;
+    }
+
+    public int getmessageId() {
+        return this.messageId;
+    }
+
+    public void AddtoMessageMap(Message message) {
+        messageMap.put(message.getId(),message);
+        this.messageId++;
     }
 
 //    public String findMessage(Date start, Date end, int k) {
